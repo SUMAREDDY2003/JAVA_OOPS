@@ -1,0 +1,95 @@
+1.-----------------------------------------------------------CAR_DEALER-----------------------------------------------------------------------
+package myproject.basics;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class CarDealer {
+    private static final Map<String, Integer> carModels = new HashMap<>();
+    private static final Map<String, Integer> additionalFees = new HashMap<>();
+    private static final int MAX_DISCOUNT = 30000;
+
+    static {
+        carModels.put("Polo Trendline", 870000);
+        carModels.put("Polo Highline", 1009000);
+        carModels.put("Virtus Trendline", 1105000);
+        carModels.put("Virtus Highline", 1308000);
+        carModels.put("Taigun Trendline", 1489000);
+        carModels.put("Taigun Highline", 1542000);
+        carModels.put("Taigun Topline", 1771000);
+
+        additionalFees.put("RTO", 113990);
+        additionalFees.put("Insurance", 47300);
+        additionalFees.put("TCS charges", 11000);
+        additionalFees.put("Additional Accessories", 15000);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Select car model: ");
+        String carModel = scanner.nextLine();
+
+        System.out.print("Do you need Insurance (yes/no): ");
+        boolean needInsurance = scanner.nextLine().equalsIgnoreCase("yes");
+
+        System.out.print("Do you need Additional Accessories (yes/no): ");
+        boolean needAccessories = scanner.nextLine().equalsIgnoreCase("yes");
+
+        System.out.print("Dealer discount (in percentage or rupees): ");
+        int dealerDiscount = scanner.nextInt();
+
+        int totalCost = calculateTotalCost(carModel, needInsurance, needAccessories, dealerDiscount);
+        if (totalCost < 0) {
+            System.out.println("Error: " + getErrorMessage(totalCost));
+        } else {
+            System.out.println("Total cost: " + formatCurrency(totalCost));
+        }
+    }
+
+    private static int calculateTotalCost(String carModel, boolean needInsurance, boolean needAccessories,
+                                          int dealerDiscount) {
+        int showroomPrice = carModels.getOrDefault("carModel", 0);
+        int totalCost = showroomPrice;
+
+        if (needInsurance) {
+            totalCost += additionalFees.getOrDefault("Insurance", 0);
+        }
+
+        if (needAccessories) {
+            totalCost += additionalFees.getOrDefault("Additional Accessories", 0);
+        }
+
+        if (dealerDiscount > MAX_DISCOUNT) {
+            return -1; // Return a negative value to represent an error
+        }
+
+        if (!needInsurance && !needAccessories && dealerDiscount != 0) {
+            return -2; // Return a negative value to represent an error
+        }
+
+        totalCost += additionalFees.getOrDefault("RTO", 0)
+                + additionalFees.getOrDefault("TCS charges", 0)
+                - Math.min(dealerDiscount, MAX_DISCOUNT);
+
+        return totalCost;
+    }
+
+    private static String getErrorMessage(int errorCode) {
+        switch (errorCode) {
+            case -1:
+                return "Maximum discount should not exceed " + MAX_DISCOUNT;
+            case -2:
+                return "Either insurance or additional accessories must be added with 0 discount";
+            default:
+                return "Unknown error";
+        }
+    }
+
+	
+	  private static String formatCurrency(int amount) { return
+	  String.format("₹%,d", amount); }
+	 
+}
+
+
